@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<application xmlns="http://ns.adobe.com/air/application/15.0">
+  <id>art.ciclope.managana</id>
+  <versionNumber>1.6.0</versionNumber>
+  <name>Managana</name>
+  <copyright>Ciclope ltda</copyright>
+  <filename>Managana</filename>
+  <supportedProfiles>extendedDesktop desktop</supportedProfiles>
+  <android>
+    <manifestAdditions><![CDATA[<manifest android:installLocation="auto">
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.SET_ORIENTATION" />
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
+	<uses-feature android:required="true" android:name="android.hardware.touchscreen.multitouch" />
+</manifest>]]></manifestAdditions>
+  </android>
+  <iPhone>
+    <InfoAdditions><![CDATA[<key>UIStatusBarStyle</key>
+<string>UIStatusBarStyleBlackOpaque</string>
+<key>UIRequiresPersistentWiFi</key>
+<string>NO</string>
+<key>UIPrerenderedIcon</key>
+<true />
+<key>UIApplicationExitsOnSuspend</key>
+<string>NO</string>
+<key>UIDeviceFamily</key>
+<array>
+	<!-- iPhone support -->
+	<string>1</string>
+	<!-- iPad support -->
+	<string>2</string>
+</array>]]></InfoAdditions>
+    <requestedDisplayResolution>high</requestedDisplayResolution>
+  </iPhone>
+  <initialWindow>
+    <title>Managana</title>
+    <content>managanaappplayer.swf</content>
+    <visible>true</visible>
+    <fullScreen>true</fullScreen>
+    <renderMode>cpu</renderMode>
+    <systemChrome>standard</systemChrome>
+    <autoOrients>true</autoOrients>    
+    <minimizable>true</minimizable>
+    <maximizable>true</maximizable>
+    <resizable>true</resizable>
+    <x>0</x>
+    <y>0</y>
+    <width>1280</width>
+    <height>720</height>
+  </initialWindow>
+  <icon>
+    <image16x16>icons/16.png</image16x16>
+    <image29x29>icons/29.png</image29x29>
+    <image32x32>icons/32.png</image32x32>
+    <image36x36>icons/36.png</image36x36>
+    <image48x48>icons/48.png</image48x48>
+    <image50x50>icons/50.png</image50x50>
+    <image57x57>icons/57.png</image57x57>
+    <image58x58>icons/58.png</image58x58>
+    <image72x72>icons/72.png</image72x72>
+    <image100x100>icons/100.png</image100x100>
+    <image114x114>icons/114.png</image114x114>
+    <image128x128>icons/128.png</image128x128>
+    <image144x144>icons/144.png</image144x144>
+    <image512x512>icons/512.png</image512x512>
+    <image1024x1024>icons/1024.png</image1024x1024>
+  </icon>
+</application>

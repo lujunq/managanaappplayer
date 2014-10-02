@@ -23,6 +23,7 @@ echo.
 echo Desktop:
 echo.
 echo  [8] Windows bundle  (bundle)
+echo  [9] AIR installer	  (air)
 echo.
 
 :choice
@@ -37,6 +38,7 @@ if "%C%"=="5" set PLATFORM=ios
 if "%C%"=="6" set PLATFORM=ios-dist
 if "%C%"=="7" set PLATFORM=ios-dist
 if "%C%"=="8" set PLATFORM=windows
+if "%C%"=="9" set PLATFORM=air
 
 if "%C%"=="1" set TARGET=-debug
 if "%C%"=="1" set OPTIONS=-connect %DEBUG_IP%
@@ -52,11 +54,13 @@ if "%C%"=="6" set TARGET=-ad-hoc
 if "%C%"=="7" set TARGET=-app-store
 
 if "%C%"=="8" set TARGET=bundle
+if "%C%"=="9" set TARGET=airinstaller
 
 call bat\Packager.bat
 
 if "%PLATFORM%"=="android" goto android-package
-if "%PLATFORM%"=="windows" goto windows-end
+if "%PLATFORM%"=="windows" goto desktop-end
+if "%PLATFORM%"=="air" goto desktop-end
 
 :ios-package
 if "%AUTO_INSTALL_IOS%" == "yes" goto ios-install
@@ -74,7 +78,7 @@ echo Now manually start application on device
 echo.
 goto end
 
-:windows-end
+:desktop-end
 echo Packaging complete.
 echo.
 goto end

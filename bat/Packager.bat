@@ -4,6 +4,7 @@ if "%PLATFORM%"=="android" goto android-config
 if "%PLATFORM%"=="ios" goto ios-config
 if "%PLATFORM%"=="ios-dist" goto ios-dist-config
 if "%PLATFORM%"=="windows" goto windows-config
+if "%PLATFORM%"=="air" goto air-config
 goto start
 
 :windows-config
@@ -13,7 +14,16 @@ set ICONS=%DESK_ICONS%
 set DIST_EXT=exe
 set TYPE=
 set DESCRIPTOR=%DESK_XML%
-goto start-desktop
+goto start-windows
+
+:air-config
+set CERT_FILE=%DESK_CERT_FILE%
+set SIGNING_OPTIONS=%DESK_SIGNING_OPTIONS%
+set ICONS=%DESK_ICONS%
+set DIST_EXT=air
+set TYPE=
+set DESCRIPTOR=%DESK_XML%
+goto start-air
 
 :android-config
 set CERT_FILE=%AND_CERT_FILE%
@@ -58,7 +68,7 @@ echo.
 if errorlevel 1 goto failed
 goto end
 
-:start-desktop
+:start-windows
 if not exist "%CERT_FILE%" goto certificate
 :: Output file
 set FILE_OR_DIR=%FILE_OR_DIR% -C "%ICONS%" .
@@ -73,6 +83,21 @@ echo.
 if errorlevel 1 goto failed
 goto end
 
+:start-air
+if not exist "%CERT_FILE%" goto certificate
+:: Output file
+set FILE_OR_DIR=%FILE_OR_DIR% -C "%ICONS%" .
+if not exist "%DIST_PATH%" md "%DIST_PATH%"
+set OUTPUT=%DIST_PATH%\%DIST_NAME%%TARGET%%NAMEADD%.%DIST_EXT%
+:: Package
+echo Packaging: %OUTPUT%
+echo using certificate: %CERT_FILE%...
+echo.
+call adt -package %SIGNING_OPTIONS% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR%
+echo.
+if errorlevel 1 goto failed
+goto end
+
 :certificate
 echo Certificate not found: %CERT_FILE%
 echo.
@@ -80,8 +105,8 @@ echo Android:
 echo - generate a default certificate using 'bat\CreateCertificate.bat'
 echo   or configure a specific certificate in 'bat\SetupApplication.bat'.
 echo.
-echo Windows: 
-echo - generate a default certificate using 'bat\CreateCertificateWindows.bat'
+echo Windows / AIR Installer: 
+echo - generate a default certificate using 'bat\CreateCertificateDesktop.bat'
 echo   or configure a specific certificate in 'bat\SetupApplication.bat'.
 echo.
 echo iOS: 

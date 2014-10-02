@@ -16,8 +16,8 @@
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
-    <class path="..\Code\ciclopeas3" />
-    <class path="..\Code\managanadepends" />
+    <class path="..\ciclopeas3" />
+    <class path="..\managanadepends" />
   </classpaths>
   <!-- Build options -->
   <build>

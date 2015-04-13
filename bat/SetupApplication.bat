@@ -29,7 +29,6 @@ set DESK_CERT_PASS=fd
 set DESK_CERT_FILE=cert\managanaappplayerdesktop.p12
 set DESK_ICONS=icons/desktop
 
-:: set AND_SIGNING_OPTIONS=-storetype pkcs12 -keystore "%AND_CERT_FILE%" -storepass %AND_CERT_PASS%
 set DESK_SIGNING_OPTIONS=-storetype pkcs12 -keystore "%DESK_CERT_FILE%"
 
 :: Application descriptor

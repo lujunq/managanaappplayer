@@ -6,7 +6,7 @@ call bat\SetupApplication.bat
 
 :: Generate
 echo.
-echo Generating a self-signed certificate for Windows bundle packaging
+echo Generating a self-signed certificate for Windows bundle and AIR packaging
 call adt -certificate -cn %DESK_CERT_NAME% 1024-RSA "%DESK_CERT_FILE%" %DESK_CERT_PASS%
 if errorlevel 1 goto failed
 

@@ -1,0 +1,34 @@
+The Managana APP player uses third-party extensions and libraries to add extra features to the software.
+All used extensions and libraries are provided under free licenses compatible with Managana's own license, LGPL 3.
+
+-------
+
+CAURINA TWEENER
+Tweener (caurina.transitions.Tweener) is a class used to create tweenings and other transitions via ActionScript code for projects built on the Flash platform. Licensed under the MIT license, the source code and more information can be found at https://code.google.com/p/tweener/
+	
+-------
+
+ADOBE AS3CORELIB
+An ActionScript3 library that contains a number of classes and utilities for working with ActionScript3. Licensed under a BSD license (http://www.opensource.org/licenses/bsd-license.php), the source code can be found at https://github.com/mikechambers/as3corelib
+	
+-------
+
+AS3 WEBSOCKET SERVER BY BEN MORROW
+Licensed under the MIT license, this library allows the creation of a server capable of listening to websocket connections from browsers. The source code can be found at https://github.com/childoftv/as3-websocket-server
+
+-------
+
+AS3 QRCODE ENCODER
+A QR code encoder library for Actionscript3 by Jean-Baptiste Pin (http://jbpin.wordpress.com) released under the MIT license. The source code can be found at https://github.com/jbpin/as3-qrcode-encoder
+
+-------
+
+ZBAR
+ZBAR is an extension to handle qr-code parsing. The original ZBAR code (http://zbar.sourceforge.net/) is licensed under LGPL 2.1 (https://www.gnu.org/licenses/lgpl-2.1.txt) by Jeff Brown. The native extension used on Managana (ZBar-ANE) was developed by Aymeric Lamboley (http://www.aymericlamboley.fr). The extension source code can be found at https://github.com/DaVikingCode/ZBar-ANE
+
+-------
+
+LEAPMOTION AS3
+The library used to add support to the LeapMotion sensor, LeapMotion AS3, was developed by Victor Norgren (http://www.logotype.se/). The library code and license can be found at https://github.com/logotype/LeapMotionAS3
+
+-------

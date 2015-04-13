@@ -1,6 +1,8 @@
 package {
 	
 	// FLASH PACKAGES
+	import art.ciclope.event.WebsocketEvent;
+	import art.ciclope.managana.graphics.DebugWindow;
 	import flash.desktop.NativeApplication;
 	import flash.display.Bitmap;
 	import flash.display.Shape;
@@ -37,6 +39,7 @@ package {
 	import art.ciclope.event.DISLoad;
 	import art.ciclope.managana.system.LinkManagerAIR;
 	import art.ciclope.managana.graphics.MessageWindow;
+	import art.ciclope.managana.graphics.CloseQRCode;
 	import art.ciclope.display.GraphicSprite;
 	import art.ciclope.managana.graphics.Target;
 	import art.ciclope.managana.data.ConfigData;
@@ -47,6 +50,11 @@ package {
 	import art.ciclope.data.LeapData;
 	import art.ciclope.event.LeapDataEvent;
 	import art.ciclope.managana.data.RemoteTCPData;
+	import art.ciclope.net.HTTPServer;
+	import art.ciclope.net.TCPServer;
+	import art.ciclope.mobile.QrCodeReader;
+	import art.ciclope.managana.data.DISLoadProtocol;
+	import art.ciclope.net.WebSocketsServer;
 	
 	/**
 	 * <b>Availability:</b> CICLOPE AS3 Classes - www.ciclope.art.br<br>
@@ -93,6 +101,17 @@ package {
 		 * Was stage clicked recently?
 		 */
 		public static var recentclick:Boolean = false;
+		/**
+		 * The debug display window.
+		 */
+		public static var debugWindow:DebugWindow;
+		
+		// STATIC CONSTANTS
+		
+		/**
+		 * Running in debug mode?
+		 */
+		public static const DEBUGGING:Boolean = false;
 		
 		// VARIABLES
 		
@@ -113,11 +132,16 @@ package {
 		private var _waiting:WaitingGraphic;				// an initial waiting feedback
 		private var _leap:LeapData;							// leap motion data
 		private var _system:Array;							// system specific controllers
+		private var _webserver:HTTPServer;					// internal web server
+		private var _websocket:WebSocketsServer;			// websocket server to listen to connected html/javascript remote controls
+		private var _qrcode:QrCodeReader;					// qrcode reading interface
 		
 		/**
 		 * App player main class constructor.
 		 */
 		public function Main():void {
+			// debugging?
+			if (Main.DEBUGGING) Main.debugWindow = new DebugWindow();
 			// check stage
 			if (this.stage != null) this.init();
 				else this.addEventListener(Event.ADDED_TO_STAGE, onStage);
@@ -183,7 +207,7 @@ package {
 			}
 			// create documents folder
 			var folder:File;
-			// is the application running from extarnal media on windows?
+			// is the application running from external media on windows?
 			if (this._managanaConfig.onRemovable) {
 				// is the external media writable?
 				folder = new File(File.applicationDirectory.nativePath + File.separator + "flashdrive.dat");
@@ -217,6 +241,18 @@ package {
 			if (!folder.isDirectory) folder.createDirectory();
 			folder = filePath("/data/offline");
 			if (!folder.isDirectory) folder.createDirectory();
+			// create cache folder and copy cache files, including the web remote control
+			folder = filePath("/cache");
+			if (folder.isDirectory) {
+				try {
+					folder.deleteDirectory(true);
+				} catch (e:Error) {
+					trace ('erro aqui apagando pasta');
+				}
+			}
+			if (!folder.isDirectory) folder.createDirectory();
+			var cacheContents:File = File.applicationDirectory.resolvePath("webroot");
+			cacheContents.copyToAsync(folder, true);
 			// prepare download streams
 			this._downloadStream = new FileStream();
 			this._remoteStream = new URLStream();
@@ -252,6 +288,7 @@ package {
 			}
 			this._managana.addEventListener(Message.OPENURL, onOpenURL);
 			this._managana.addEventListener(Message.OPENHTMLBOX, onHTMLBox);
+			this._managana.addEventListener(Message.MESSAGE, onGenericMessage);
 			this.addChild(this._managana);
 			// target mode
 			if (this._managanaConfig.getConfig("desktop") == "true") {
@@ -299,6 +336,7 @@ package {
 			if (this._managanaConfig.isConfig('showuser')) showuser = (this._managanaConfig.getConfig('showuser') == "true");
 			this._interface = new ManaganaInterface(readerserver, key, method, ending, true, showinterface, showclock, showvote, true, showcomment, showrate, shownote, showzoom, showuser, this.saveOffline, this.getOffline);
 			this._interface.addEventListener(Message.OPENURL, onOpenURL);
+			this._interface.addEventListener(Message.MESSAGE, onGenericMessage);
 			this._interface.addEventListener(ReaderServerEvent.SYSTEM_INFO, onSystemInfo);
 			this._interface.addEventListener(ReaderServerEvent.NOSYSTEM, noSystem);
 			this._interface.systemNotes = localNotes;
@@ -376,10 +414,24 @@ package {
 				this._leap.addEventListener(LeapDataEvent.TYPE_SWIPE_PREVX, onLeapPrevX);
 				this._leap.addEventListener(LeapDataEvent.TYPE_SWIPE_PREVY, onLeapPrevY);
 			}
-			// system specific controllers
+			// internal webserver
+			this._webserver = new HTTPServer();
+			this._webserver.start(uint(this._managanaConfig.getConfig('webserverport')), this.filePath(''));
+			// websockets server
+			this._websocket = new WebSocketsServer();
+			this._websocket.addEventListener(WebsocketEvent.NEWCLIENT, onWebsocketNew);
+			this._websocket.addEventListener(WebsocketEvent.CLIENTCLOSE, onWebsocketClose);
+			this._websocket.addEventListener(WebsocketEvent.RECEIVED, onWebsocketReceived);
+			this._websocket.addEventListener(Event.COMPLETE, onWebsocketReady);
+			this._websocket.bind(TCPServer.ipv4, uint(this._managanaConfig.getConfig('websocketport')));
+			// system specific controllers (none yet)
 			this._system = new Array();
-				// Android system
-				//this._system['XperiaPlay'] = new XperiaPlay(this.stage, this._managana, this._interface);
+			// qr code reading
+			this._qrcode = new QrCodeReader(stage.stageWidth, stage.stageHeight, this._managana.pCodeParser, new CloseQRCode() as Sprite);
+			this._qrcode.addEventListener(Event.CLOSE, onQRCodeClose);
+			
+			// show debug?
+			if (Main.DEBUGGING) this.stage.addChild(Main.debugWindow);
 		}
 		
 		/**
@@ -775,6 +827,7 @@ package {
 			this.stage.frameRate = 10;
 			this._playActivate = this._managana.playing;
 			this._managana.pause();
+			this._linkmanager.setComSize(this._managana.currentCommunityWidth, this._managana.currentCommunityHeight);
 			this._linkmanager.openURL(String(evt.param.value));
 		}
 		
@@ -785,10 +838,40 @@ package {
 			this.stage.frameRate = 10;
 			this._playActivate = this._managana.playing;
 			this._managana.pause();
-			if (this.checkLocal(this._managana.currentCommunity) == "") {
-				this._boxmanager.openURL(this._managanaConfig.getConfig('server') + "community/" + this._managana.currentCommunity + ".dis/media/" + evt.param.from + "/html/" +  String(evt.param.folder) + "/index.html");
-			} else {
-				this._boxmanager.openURL(this.checkLocal(this._managana.currentCommunity) + "/media/" + evt.param.from + "/html/" +  String(evt.param.folder) + "/index.html");
+			this._boxmanager.setComSize(this._managana.currentCommunityWidth, this._managana.currentCommunityHeight);
+			switch (this._managana.lastComProtocol) {
+				case DISLoadProtocol.PROTOCOL_APP:
+					this._boxmanager.openURL('http://localhost:' + this._managanaConfig.getConfig('webserverport') + '/cache/community/' + this._managana.currentCommunity + '.dis/' + String(evt.param.folder) + '/index.html');
+					break;
+				case DISLoadProtocol.PROTOCOL_FILE:
+					this._boxmanager.openURL('http://localhost:' + this._managanaConfig.getConfig('webserverport') + '/community/' + (this._managana.currentCommunity) + ".dis/media/" + evt.param.from + "/html/" +  String(evt.param.folder) + "/index.html");
+					break;
+				case DISLoadProtocol.PROTOCOL_HTTP:
+				case DISLoadProtocol.PROTOCOL_UNKNOWN:
+					this._boxmanager.openURL(this._managanaConfig.getConfig('server') + "community/" + this._managana.currentCommunity + ".dis/media/" + evt.param.from + "/html/" +  String(evt.param.folder) + "/index.html");
+					break;
+			}
+		}
+		
+		/**
+		 * Process a generic message recceived from the player.
+		 * @param	evt	the message information
+		 */
+		private function onGenericMessage(evt:Message):void {
+			if (evt.param != null) {
+				if (evt.param.ac != null) {
+					switch (String(evt.param.ac)) {
+						case "readQRCode":
+							this.startQRCodeReading();
+							break;
+						case "showRemoteInfo":
+							if (this._websocket.ready) {
+								this._interface.showQRCode('http://' + TCPServer.ipv4 + ':' + this._managanaConfig.getConfig('webserverport') + '/cache/remote/index.html');
+								this._interface.closeInterface();
+							}
+							break;
+					}
+				}
 			}
 		}
 		
@@ -827,6 +910,9 @@ package {
 				this._managana.x = wToUse / 2;
 				this._managana.y = hToUse / 2;
 				if (this._interface != null) this._interface.redraw();
+			}
+			if (this._qrcode != null) {
+				this._qrcode.resize(stage.stageWidth, stage.stageHeight);
 			}
 		}
 		
@@ -1101,6 +1187,25 @@ package {
 		}
 		
 		/**
+		 * Start the qrcode reading interface.
+		 */
+		private function startQRCodeReading():void {
+			if (this._managanaConfig.getConfig("desktop") != "true") {
+				this._managana.pause();
+				this._qrcode.startReading();
+				stage.addChild(this._qrcode);
+			}
+		}
+		
+		/**
+		 * QRCode reading interface was closed.
+		 */
+		private function onQRCodeClose(evt:Event):void {
+			stage.removeChild(this._qrcode);
+			this._managana.play();
+		}
+		
+		/**
 		 * Prevent change from fullscreen on desktop application.
 		 */
 		private function displayStateChanged(evt:FullScreenEvent):void {
@@ -1121,6 +1226,50 @@ package {
 					if (this._managanaConfig.getConfig('desktop') == "true") if (this._leap != null) if (this._leap.ready) this._leap.calibrate(this.stage, this._interface.getText('LEAPCALIBRATING'), this._interface.getText('LEAPERROR'), this._interface.getText('LEAPSUCCESS'), this._interface.getText('LEAPPOINTTL'), this._interface.getText('LEAPPOINTBR'));
 					break;
 			}
+		}
+		
+		/**
+		 * A new client just connected to the websocket interface.
+		 */
+		private function onWebsocketNew(evt:WebsocketEvent):void {
+			this._interface.closeQRCode();
+		}
+		
+		/**
+		 * A websocket client closed connection.
+		 */
+		private function onWebsocketClose(evt:WebsocketEvent):void {
+			trace ('websocket client close');
+		}
+		
+		/**
+		 * A message was received from the websocket interface.
+		 */
+		private function onWebsocketReceived(evt:WebsocketEvent):void {
+			trace ('websocket message received: ' + evt.message);
+		}
+		
+		/**
+		 * The websocket interface is ready.
+		 */
+		private function onWebsocketReady(evt:Event):void {
+			// create javascript websocket info file on webserver cache folder
+			var infoFile:File = filePath("/websocket.js");
+			var fileContent:String = "var webSocketAddress = '" + this._websocket.ipv4Address + "';\n";
+			var fstream:FileStream = new FileStream();
+			fstream.open(infoFile, FileMode.WRITE);
+			fstream.writeUTFBytes(fileContent);
+			fstream.close();
+		}
+		
+		// STATIC METHODS
+		
+		/**
+		 * Add a line to the debug display.
+		 * @param	text	the string to add to debug
+		 */
+		public static function addDebug(text:String):void {
+			if (Main.DEBUGGING) Main.debugWindow.out(text);
 		}
 		
 	}

@@ -6,7 +6,7 @@
 	</config>
 	<config>
 		<name>community</name>
-		<value>managanaintroen</value>
+		<value>index</value>
 	</config>
 	<config>
 		<name>stream</name>
@@ -50,7 +50,7 @@
 	</config>
 	<config>
 		<name>showuser</name>
-		<value>false</value>
+		<value>true</value>
 	</config>
 	<config>
 		<name>bgcolor</name>
@@ -71,5 +71,13 @@
 	<config>
 		<name>comfolder</name>
 		<value>root</value>
+	</config>
+	<config>
+		<name>webserverport</name>
+		<value>8090</value>
+	</config>
+	<config>
+		<name>websocketport</name>
+		<value>9080</value>
 	</config>
 </data>

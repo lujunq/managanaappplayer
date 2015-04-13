@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <application xmlns="http://ns.adobe.com/air/application/15.0">
   <id>art.ciclope.managana</id>
-  <versionNumber>1.6.0</versionNumber>
+  <versionNumber>1.6.4</versionNumber>
   <name>Managana</name>
   <copyright>Ciclope ltda</copyright>
   <filename>Managana</filename>
@@ -15,6 +15,9 @@
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
+	<uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> 
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> 
 	<uses-feature android:required="true" android:name="android.hardware.touchscreen.multitouch" />
 </manifest>]]></manifestAdditions>
   </android>
@@ -62,4 +65,8 @@
     <image512x512>icons/512.png</image512x512>
     <image1024x1024>icons/1024.png</image1024x1024>
   </icon>
+  <extensions>
+	<!-- qrcode reading --
+    <extensionID>com.davikingcode.nativeExtensions.ZBar</extensionID><!-- -->
+  </extensions>
 </application>

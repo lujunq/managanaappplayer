@@ -14,6 +14,7 @@ set ICONS=%DESK_ICONS%
 set DIST_EXT=exe
 set TYPE=
 set DESCRIPTOR=%DESK_XML%
+set EXTINCLUDE=
 goto start-windows
 
 :air-config
@@ -23,6 +24,7 @@ set ICONS=%DESK_ICONS%
 set DIST_EXT=air
 set TYPE=
 set DESCRIPTOR=%DESK_XML%
+set EXTINCLUDE=
 goto start-air
 
 :android-config
@@ -32,6 +34,7 @@ set ICONS=%AND_ICONS%
 set DIST_EXT=apk
 set TYPE=apk
 set DESCRIPTOR=%APP_XML%
+set EXTINCLUDE=-extdir ext/
 goto start
 
 :ios-config
@@ -41,6 +44,7 @@ set ICONS=%IOS_ICONS%
 set DIST_EXT=ipa
 set TYPE=ipa
 set DESCRIPTOR=%APP_XML%
+set EXTINCLUDE-extdir ext/
 goto start
 
 :ios-dist-config
@@ -50,6 +54,7 @@ set ICONS=%IOS_ICONS%
 set DIST_EXT=ipa
 set TYPE=ipa
 set DESCRIPTOR=%APP_XML%
+set EXTINCLUDE=-extdir ext/
 goto start
 
 
@@ -63,7 +68,8 @@ set OUTPUT=%DIST_PATH%\%DIST_NAME%%TARGET%%NAMEADD%.%DIST_EXT%
 echo Packaging: %OUTPUT%
 echo using certificate: %CERT_FILE%...
 echo.
-call adt -package -target %TYPE%%TARGET% %OPTIONS% %SIGNING_OPTIONS% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR%
+echo command: adt -package -target %TYPE%%TARGET% %OPTIONS% %SIGNING_OPTIONS% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR% %EXTINCLUDE%
+call adt -package -target %TYPE%%TARGET% %OPTIONS% %SIGNING_OPTIONS% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR% %EXTINCLUDE%
 echo.
 if errorlevel 1 goto failed
 goto end

@@ -23,7 +23,7 @@ echo.
 echo Desktop:
 echo.
 echo  [8] Windows bundle  (bundle)
-echo  [9] AIR installer	  (air)
+echo  [9] AIR installer   (air)
 echo.
 
 :choice

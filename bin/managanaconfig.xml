@@ -6,7 +6,7 @@
 	</config>
 	<config>
 		<name>community</name>
-		<value>index</value>
+		<value>test</value>
 	</config>
 	<config>
 		<name>stream</name>

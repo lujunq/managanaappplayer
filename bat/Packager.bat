@@ -68,8 +68,8 @@ set OUTPUT=%DIST_PATH%\%DIST_NAME%%TARGET%%NAMEADD%.%DIST_EXT%
 echo Packaging: %OUTPUT%
 echo using certificate: %CERT_FILE%...
 echo.
-echo command: adt -package -target %TYPE%%TARGET% %OPTIONS% %SIGNING_OPTIONS% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR% %EXTINCLUDE%
-call adt -package -target %TYPE%%TARGET% %OPTIONS% %SIGNING_OPTIONS% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR% %EXTINCLUDE%
+echo command: adt -package -tsa none -target %TYPE%%TARGET% %OPTIONS% %SIGNING_OPTIONS% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR% %EXTINCLUDE%
+call adt -package -tsa none -target %TYPE%%TARGET% %OPTIONS% %SIGNING_OPTIONS% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR% %EXTINCLUDE%
 echo.
 if errorlevel 1 goto failed
 goto end
@@ -84,7 +84,7 @@ set OUTPUT=%DIST_PATH%\%DIST_NAME%%TARGET%%NAMEADD%
 echo Packaging: %OUTPUT%
 echo using certificate: %CERT_FILE%...
 echo.
-call adt -package %SIGNING_OPTIONS% -target %TYPE%%TARGET% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR%
+call adt -package -tsa none %SIGNING_OPTIONS% -target %TYPE%%TARGET% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR%
 echo.
 if errorlevel 1 goto failed
 goto end
@@ -99,7 +99,7 @@ set OUTPUT=%DIST_PATH%\%DIST_NAME%%TARGET%%NAMEADD%.%DIST_EXT%
 echo Packaging: %OUTPUT%
 echo using certificate: %CERT_FILE%...
 echo.
-call adt -package %SIGNING_OPTIONS% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR%
+call adt -package -tsa none %SIGNING_OPTIONS% "%OUTPUT%" "%DESCRIPTOR%" %FILE_OR_DIR%
 echo.
 if errorlevel 1 goto failed
 goto end

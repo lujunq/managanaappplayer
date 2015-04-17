@@ -1,4 +1,4 @@
-The Managana APP player uses third-party extensions and libraries to add extra features to the software.
+Managana uses third-party extensions and libraries to add extra features to the software.
 All used extensions and libraries are provided under free licenses compatible with Managana's own license, LGPL 3.
 
 -------

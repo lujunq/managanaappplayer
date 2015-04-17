@@ -247,7 +247,7 @@ package {
 				try {
 					folder.deleteDirectory(true);
 				} catch (e:Error) {
-					trace ('erro aqui apagando pasta');
+					// do nothing
 				}
 			}
 			if (!folder.isDirectory) folder.createDirectory();
@@ -882,6 +882,7 @@ package {
 			this.stage.frameRate = 10;
 			this._playActivate = this._managana.playing;
 			this._managana.pause();
+			this._linkmanager.setComSize(this._managana.currentCommunityWidth, this._managana.currentCommunityHeight);
 			this._linkmanager.authenticate(evt.param.value);
 		}
 		

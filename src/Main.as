@@ -111,7 +111,7 @@ package {
 		/**
 		 * Running in debug mode?
 		 */
-		public static const DEBUGGING:Boolean = false;
+		public static const DEBUGGING:Boolean = true;
 		
 		// VARIABLES
 		
@@ -921,9 +921,11 @@ package {
 		 * Zoom gesture.
 		 */
 		private function onZoom(evt:TransformGestureEvent):void {
-			if (!this._linkmanager.visible && !this._boxmanager.visible) {
-				this._managana.scaleX *= evt.scaleX;
-				this._managana.scaleY = this._managana.scaleX;
+			if (this._managana.userZoom) {
+				if (!this._linkmanager.visible && !this._boxmanager.visible) {
+					this._managana.scaleX *= evt.scaleX;
+					this._managana.scaleY = this._managana.scaleX;
+				}
 			}
 		}
 		
@@ -985,7 +987,7 @@ package {
 			if (this._managana.allowDrag) {
 				Main.dragging = true;
 				this._managana.mouseChildren = false;
-				this._managana.startDrag();
+				if (this._managana.userDrag) this._managana.startDrag();
 			}
 		}
 		
@@ -998,7 +1000,7 @@ package {
 					clearTimeout(Main.drinterval);
 				}
 				Main.dragging = false;
-				this._managana.stopDrag();
+				if (this._managana.userDrag) this._managana.stopDrag();
 				this._managana.mouseChildren = true;
 			}
 		}
